@@ -3,10 +3,9 @@ pragma circom 2.1.6;
 // =============================================================================
 // DEPRECATED — V1. Do NOT build new systems on this circuit.
 //
-// V2 (`v2/stealth_reputation.circom`) is canonical (Execution Plan D3). V1 is
-// frozen and retained ONLY because the deployed Ethereum PSR verifier still
-// references it, pending its V2 upgrade (Task 0.6). All new circuits, contracts,
-// programs, and SDK paths MUST target V2 or higher. No new features land on V1.
+// V2 (`v2/stealth_reputation.circom`) is canonical. V1 is frozen and retained
+// ONLY because the deployed Ethereum PSR verifier still references it. All new
+// circuits, contracts, programs, and SDK paths MUST target V2 or higher.
 // =============================================================================
 
 include "node_modules/circomlib/circuits/poseidon.circom";

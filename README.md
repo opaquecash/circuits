@@ -10,16 +10,16 @@ Proof system: **Groth16** (BN254 / alt_bn128). Tree depth: **20**.
 
 | File | Version | Status |
 |:---|:---|:---|
-| `stealth_attestation.circom` | **V1** | **DEPRECATED.** Frozen. Retained only because the deployed Ethereum verifier still references it, pending its V2 upgrade (Execution Plan Task 0.6). No new system may build on V1. |
-| `v2/stealth_reputation.circom` | **V2** | **Canonical (Execution Plan D3).** Schema-bound issuance; powers Solana's production PSR. |
+| `stealth_attestation.circom` | **V1** | **DEPRECATED.** Frozen. Retained only because the deployed Ethereum verifier still references it. No new system may build on V1. |
+| `v2/stealth_reputation.circom` | **V2** | **Canonical.** Schema-bound issuance; powers Solana's production PSR. |
 
 ### Why two circuits
 
-Per decision **D3**, **V2 (`stealth_reputation`) is canonical** — it carries the richer
-schema / issuer / trait model. **V1 is deprecated: all new circuits, contracts, programs,
-and SDK paths MUST target V2 or higher**, and no new features land on V1. V1 survives only
-because the Ethereum PSR verifier is still on it; until that verifier is regenerated against
-V2 (Task 0.6), cross-chain reputation proofs are **not** interchangeable, and this temporary
+**V2 (`stealth_reputation`) is canonical** — it carries the richer schema / issuer /
+trait model. **V1 is deprecated: all new circuits, contracts, programs, and SDK paths
+MUST target V2 or higher**, and no new features land on V1. V1 survives only because the
+Ethereum PSR verifier is still on it; until that verifier is regenerated against V2,
+cross-chain reputation proofs are **not** interchangeable, and this temporary
 incompatibility is documented in `spec/PSR.md`. The DKSAP *payment* layer is unaffected and
 is fully cross-chain.
 
@@ -75,6 +75,5 @@ python3 test/generate_vectors.py
 
 ## Consumers
 
-The Ethereum and Solana repos currently carry their own copies of these files. They will
-be re-wired to consume this repo as a git submodule (Execution Plan Task 0.3) so a circuit
-change is a single PR. Until then, keep changes here and mirror them deliberately.
+The Ethereum and Solana repos consume this repo as a git submodule, so a circuit change is
+a single PR here. Keep this repo the source of truth and update consumers via the submodule.
