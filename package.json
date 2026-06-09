@@ -1,0 +1,22 @@
+{
+  "name": "opaque-circuits",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Canonical Circom circuits for Opaque Cash: V1 stealth_attestation and V2 stealth_reputation (canonical per Execution Plan D3).",
+  "scripts": {
+    "download:ptau": "bash scripts/download_ptau.sh",
+    "build": "npm run build:v1 && npm run build:v2",
+    "build:v1": "circom stealth_attestation.circom --r1cs --wasm --sym -o build/",
+    "build:v2": "circom v2/stealth_reputation.circom --r1cs --wasm --sym -o v2/build/",
+    "setup": "snarkjs groth16 setup build/stealth_attestation.r1cs pot16_final.ptau build/stealth_attestation_0000.zkey",
+    "contribute": "snarkjs zkey contribute build/stealth_attestation_0000.zkey build/stealth_attestation_final.zkey --name='Opaque Phase 1'",
+    "export-vkey": "snarkjs zkey export verificationkey build/stealth_attestation_final.zkey build/verification_key.json",
+    "export-sol": "snarkjs zkey export solidityverifier build/stealth_attestation_final.zkey build/Groth16Verifier.sol",
+    "prove": "snarkjs groth16 prove build/stealth_attestation_final.zkey build/stealth_attestation_js/witness.wtns build/proof.json build/public.json",
+    "verify": "snarkjs groth16 verify build/verification_key.json build/public.json build/proof.json"
+  },
+  "devDependencies": {
+    "circomlib": "^2.0.5",
+    "snarkjs": "^0.7.5"
+  }
+}

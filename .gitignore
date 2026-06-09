@@ -1,0 +1,18 @@
+node_modules/
+
+# Circom build outputs (regenerate locally / in CI)
+build/
+v2/build/
+
+# Powers of Tau (large binaries; fetch via scripts/download_ptau.sh)
+*.ptau
+
+# Generated proving/verifying keys, symbol dumps, witnesses (regenerated)
+*.zkey
+*.sym
+*.r1cs
+*.wtns
+
+# Python
+__pycache__/
+*.pyc
