@@ -3,8 +3,7 @@
 [![CI](https://github.com/opaquecash/circuits/actions/workflows/circuit-test.yml/badge.svg)](https://github.com/opaquecash/circuits/actions/workflows/circuit-test.yml)
 
 Canonical source of truth for the Opaque Cash zero-knowledge circuits. Both chains
-consume these circuits (today as copies, soon as a git submodule — see *Consumers*),
-so a circuit change happens here once.
+consume this repo as a git submodule, so a circuit change happens here once.
 
 Proof system: **Groth16** (BN254 / alt_bn128). Tree depth: **20**.
 
@@ -12,31 +11,22 @@ Proof system: **Groth16** (BN254 / alt_bn128). Tree depth: **20**.
 
 | File | Version | Status |
 |:---|:---|:---|
-| `stealth_attestation.circom` | **V1** | **DEPRECATED.** Frozen. Retained only because the deployed Ethereum verifier still references it. No new system may build on V1. |
-| `v2/stealth_reputation.circom` | **V2** | **Canonical.** Schema-bound issuance; powers Solana's production PSR. |
+| `v2/stealth_reputation.circom` | **V2** | **Canonical.** Schema-bound issuance; verified on both chains. |
 
-### Why two circuits
+V2 binds the leaf to `Poseidon(stealth_pk, schema_id, issuer_pk_x, trait_data_hash, nonce)`
+and takes `nullifier_hash` as a public input; public signals are
+`[merkle_root, attestation_id, external_nullifier, nullifier_hash]`. See the `.circom`
+header for the full signal layout.
 
-**V2 (`stealth_reputation`) is canonical** — it carries the richer schema / issuer /
-trait model. **V1 is deprecated: all new circuits, contracts, programs, and SDK paths
-MUST target V2 or higher**, and no new features land on V1. V1 survives only because the
-Ethereum PSR verifier is still on it; until that verifier is regenerated against V2,
-cross-chain reputation proofs are **not** interchangeable, and this temporary
-incompatibility is documented in `spec/PSR.md`. The DKSAP *payment* layer is unaffected and
-is fully cross-chain.
-
-V1 public signals: `merkle_root, attestation_id, external_nullifier` (inputs) →
-`nullifier, is_valid` (outputs). V2 binds the leaf to
-`Poseidon(stealth_pk, schema_id, issuer_pk_x, trait_data_hash, nonce)` and takes
-`nullifier_hash` as a public input. See each `.circom` header for the full signal layout.
+> **V1 (`stealth_attestation`) was retired 2026-06-10.** No deployed verifier accepts V1
+> proofs (the Solana V1 path never functioned — see `spec/changelog.md` — and Ethereum is
+> V2-only). The file lives in git history before this date if ever needed for archaeology.
 
 ## Layout
 
 ```
 circuits/
-├── stealth_attestation.circom   V1 circuit
 ├── v2/stealth_reputation.circom V2 circuit (canonical)
-├── generate_witness.js          sample input.json builder (circomlibjs)
 ├── scripts/download_ptau.sh      fetches the Powers of Tau (not committed)
 ├── scripts/generate_v2_fixture.js regenerates test/fixtures/v2/ from the production zkey
 ├── test/
@@ -53,9 +43,9 @@ circuits/
 Prerequisites: [circom](https://docs.circom.io) 2.1.6+, [snarkjs](https://github.com/iden3/snarkjs) 0.7+, Node 18+.
 
 ```bash
-npm install              # circomlib (resolved at node_modules/ for both V1 and V2 includes)
+npm install              # circomlib (resolved at node_modules/ for the V2 includes)
 npm run download:ptau    # fetch pot16_final.ptau (~75 MB, NOT committed)
-npm run build            # build:v1 + build:v2 → r1cs + wasm under build/ and v2/build/
+npm run build            # V2 → r1cs + wasm under v2/build/
 npm run setup            # Groth16 trusted setup (dev only)
 ```
 
@@ -69,9 +59,9 @@ in-browser via the WASM generator.
 
 ### Powers of Tau strategy
 
-`pot16` (2^16 = 65,536 constraints) is the pinned ceremony file. Measured circuit
-sizes: V1 `stealth_attestation` = 9,461 constraints, V2 `stealth_reputation` = 5,421 —
-both fit with an order of magnitude of headroom, so no switch to
+`pot16` (2^16 = 65,536 constraints) is the pinned ceremony file. Measured size:
+V2 `stealth_reputation` = 5,421 constraints —
+it fits with an order of magnitude of headroom, so no switch to
 `powersOfTau28_hez_final_17.ptau` is needed. `npm test` asserts the V2 constraint
 count still fits pot16 and fails the build if a circuit change outgrows it.
 

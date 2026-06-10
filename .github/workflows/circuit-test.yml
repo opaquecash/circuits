@@ -31,9 +31,9 @@ jobs:
           npm ci
           npm ci --prefix v2
 
-      - name: Build V1 + V2
+      - name: Build V2
         run: |
-          mkdir -p build v2/build
+          mkdir -p v2/build
           npm run build
 
       - name: Cache Powers of Tau
