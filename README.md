@@ -1,5 +1,7 @@
 # Opaque Cash — Circuits
 
+[![CI](https://github.com/opaquecash/circuits/actions/workflows/circuit-test.yml/badge.svg)](https://github.com/opaquecash/circuits/actions/workflows/circuit-test.yml)
+
 Canonical source of truth for the Opaque Cash zero-knowledge circuits. Both chains
 consume these circuits (today as copies, soon as a git submodule — see *Consumers*),
 so a circuit change happens here once.
