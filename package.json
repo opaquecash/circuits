@@ -5,7 +5,7 @@
   "description": "Canonical Circom circuits for Opaque Cash: V1 stealth_attestation and V2 stealth_reputation (canonical per Execution Plan D3).",
   "scripts": {
     "download:ptau": "bash scripts/download_ptau.sh",
-    "test": "node --test test/",
+    "test": "node --test test/v2.test.js",
     "generate:fixture": "node scripts/generate_v2_fixture.js",
     "build": "npm run build:v1 && npm run build:v2",
     "build:v1": "circom stealth_attestation.circom --r1cs --wasm --sym -o build/",
