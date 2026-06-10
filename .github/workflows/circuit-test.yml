@@ -36,5 +36,16 @@ jobs:
           mkdir -p build v2/build
           npm run build
 
-      # Phase 1.2 will add `npm test` here: snarkjs runner over
-      # test/test_vectors.json plus a live V2 proof round-trip.
+      - name: Cache Powers of Tau
+        uses: actions/cache@v4
+        with:
+          path: pot16_final.ptau
+          key: ptau-pot16-hez-final
+
+      - name: Download Powers of Tau
+        run: npm run download:ptau
+
+      # Production-vkey fixture checks + live V2 round-trip:
+      # witness → fresh Groth16 setup (pot16) → prove → verify.
+      - name: Test
+        run: npm test

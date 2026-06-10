@@ -39,8 +39,9 @@ for url in "${URLS[@]}"; do
   echo "Trying $url"
   if fetch "$url"; then
     echo "Done. $(du -h "$OUT" | cut -f1) $OUT"
-    echo "Note: 2^16 (~65k constraints) fits V1 (~50k). If V2 exceeds it,"
-    echo "re-run with a larger power, e.g.: bash scripts/download_ptau.sh 17"
+    echo "Note: 2^16 (65,536 constraints) comfortably fits V1 (9,461) and"
+    echo "V2 (5,421). If a future circuit exceeds it, re-run with a larger"
+    echo "power, e.g.: bash scripts/download_ptau.sh 17"
     exit 0
   fi
   rm -f "$OUT"

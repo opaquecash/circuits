@@ -38,7 +38,10 @@ circuits/
 ├── v2/stealth_reputation.circom V2 circuit (canonical)
 ├── generate_witness.js          sample input.json builder (circomlibjs)
 ├── scripts/download_ptau.sh      fetches the Powers of Tau (not committed)
+├── scripts/generate_v2_fixture.js regenerates test/fixtures/v2/ from the production zkey
 ├── test/
+│   ├── v2.test.js               V2 verification tests (npm test)
+│   ├── fixtures/v2/             production vkey + real proof fixture (committed)
 │   ├── test_vectors.json        DKSAP test vectors (cross-validated)
 │   └── generate_vectors.py      reproducible vector generator
 ├── package.json
@@ -63,6 +66,38 @@ in-browser via the WASM generator.
 > **Trusted setup is development-only.** The Hermez Phase-1 ptau plus a local Phase-2
 > contribution is fine for testing; a production deployment requires an audited
 > multi-party ceremony.
+
+### Powers of Tau strategy
+
+`pot16` (2^16 = 65,536 constraints) is the pinned ceremony file. Measured circuit
+sizes: V1 `stealth_attestation` = 9,461 constraints, V2 `stealth_reputation` = 5,421 —
+both fit with an order of magnitude of headroom, so no switch to
+`powersOfTau28_hez_final_17.ptau` is needed. `npm test` asserts the V2 constraint
+count still fits pot16 and fails the build if a circuit change outgrows it.
+
+## Tests
+
+```bash
+npm test
+```
+
+`test/v2.test.js` runs two layers:
+
+1. **Production-key checks** (no build needed): the committed fixture in
+   `test/fixtures/v2/` is a *real* Groth16 proof generated with the production
+   proving key — the same setup whose verification key is transcribed into
+   `ethereum`'s `Groth16VerifierV2.sol` and `solana`'s `groth16-verifier` program.
+   The tests verify it (and reject tampered variants) against the committed
+   `verification_key.json`, pinning the production vkey in CI.
+2. **Live round-trip** (CI, needs `npm run build` + `npm run download:ptau`):
+   witness → fresh Groth16 setup → prove → verify, plus a negative check that a
+   fresh-setup proof does *not* verify under the production vkey.
+
+Regenerate the fixture after a circuit change (requires the production wasm/zkey):
+
+```bash
+npm run generate:fixture -- <stealth_reputation.wasm> <stealth_reputation_final.zkey>
+```
 
 ## Test vectors
 
