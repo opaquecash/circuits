@@ -1,0 +1,40 @@
+name: Circuits
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  CIRCOM_VERSION: v2.1.9
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install circom ${{ env.CIRCOM_VERSION }}
+        run: |
+          curl -sSfL "https://github.com/iden3/circom/releases/download/${CIRCOM_VERSION}/circom-linux-amd64" \
+            -o /usr/local/bin/circom
+          chmod +x /usr/local/bin/circom
+          circom --version
+
+      - name: Install deps (root + v2)
+        run: |
+          npm ci
+          npm ci --prefix v2
+
+      - name: Build V1 + V2
+        run: |
+          mkdir -p build v2/build
+          npm run build
+
+      # Phase 1.2 will add `npm test` here: snarkjs runner over
+      # test/test_vectors.json plus a live V2 proof round-trip.
