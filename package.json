@@ -5,15 +5,16 @@
   "description": "Canonical Circom circuits for Opaque Cash: V2 stealth_reputation (V1 stealth_attestation retired 2026-06-10).",
   "scripts": {
     "download:ptau": "bash scripts/download_ptau.sh",
-    "test": "node --test test/v2.test.js",
+    "test": "node --test test/v2.test.js test/pool.test.js",
     "generate:fixture": "node scripts/generate_v2_fixture.js",
-    "build": "circom v2/stealth_reputation.circom --r1cs --wasm --sym -o v2/build/",
+    "build": "circom v2/stealth_reputation.circom --r1cs --wasm --sym -o v2/build/ && circom v2/withdrawal.circom --r1cs --wasm --sym -o v2/build/ && circom v2/association.circom --r1cs --wasm --sym -o v2/build/",
     "setup": "snarkjs groth16 setup v2/build/stealth_reputation.r1cs pot16_final.ptau v2/build/stealth_reputation_0000.zkey",
     "contribute": "snarkjs zkey contribute v2/build/stealth_reputation_0000.zkey v2/build/stealth_reputation_final.zkey --name='Opaque V2'",
     "export-vkey": "snarkjs zkey export verificationkey v2/build/stealth_reputation_final.zkey v2/build/verification_key.json",
     "export-sol": "snarkjs zkey export solidityverifier v2/build/stealth_reputation_final.zkey v2/build/Groth16VerifierV2.sol",
     "prove": "snarkjs groth16 prove v2/build/stealth_reputation_final.zkey v2/build/stealth_reputation_js/witness.wtns v2/build/proof.json v2/build/public.json",
-    "verify": "snarkjs groth16 verify v2/build/verification_key.json v2/build/public.json v2/build/proof.json"
+    "verify": "snarkjs groth16 verify v2/build/verification_key.json v2/build/public.json v2/build/proof.json",
+    "generate:pool-fixture": "node scripts/generate_pool_fixture.js v2/build/withdrawal_js/withdrawal.wasm v2/build/withdrawal_final.zkey"
   },
   "devDependencies": {
     "circomlib": "^2.0.5",
