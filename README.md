@@ -55,4 +55,4 @@ generator (`test/generate_vectors.py`); referenced by
 
 ## License
 
-MIT.
+GPL-3.0.
