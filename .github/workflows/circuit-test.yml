@@ -8,6 +8,9 @@ on:
 env:
   CIRCOM_VERSION: v2.1.9
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest

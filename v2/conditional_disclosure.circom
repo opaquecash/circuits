@@ -119,6 +119,15 @@ template ConditionalDisclosure(levels) {
     gt.out === 1;
 
     // ── 3. disclosure nullifier (also binds context) ──────────────────────────
+    // SECURITY NOTE (OPQ-024) — disclosure_nullifier = Poseidon(nullifier, context, DOMAIN)
+    // binds only `nullifier` and `context`, NOT the commitment/value/label. So the effective
+    // consume-once granularity is per (nullifier, context), not the per (commitment, context)
+    // the spec claims: two commitments sharing a nullifier collide under the same context
+    // (disclosing one blocks disclosing the other — a self-inflicted DoS). The fix binds the
+    // commitment — `Poseidon(commitment, context, DOMAIN)` — but requires a new trusted-setup
+    // ceremony (mainnet-gated) + verifier redeploy, so it is NOT applied here. Until then the
+    // SDK draws a fresh nullifier per deposit and the true granularity is documented in
+    // spec/conditional-disclosure.md.
     component null_hasher = Poseidon(3);
     null_hasher.inputs[0] <== nullifier;
     null_hasher.inputs[1] <== context;

@@ -54,6 +54,16 @@ template StealthReputation(levels) {
     // ── Compute V2 Leaf ───────────────────────────────────────────────────────
     // leaf = Poseidon(stealth_pk, schema_id, issuer_pk_x, trait_data_hash, nonce)
     // This binds the proof to a specific schema AND a specific issuer.
+    //
+    // SECURITY NOTE (OPQ-018) — the leaf commits to no revocation/expiry field, and neither
+    // this circuit nor the on-chain verifier reads the attestation's revocation_slot/
+    // expiration. So a leaf already inside a registered root keeps proving valid after the
+    // credential is revoked or expires (bounded by the ~1h root TTL, though a stale root can be
+    // re-registered). A full fix binds a revocation/expiry-aware commitment into the leaf (or
+    // moves to a nullifier/accumulator scheme), which needs a new trusted-setup ceremony
+    // (mainnet-gated). Mitigation until then: the indexer MUST rebuild and re-register the
+    // Merkle root EXCLUDING revoked/expired leaves on every revocation event, so a fresh root
+    // never contains a dead credential (documented in spec/PSR.md).
     component leaf_hasher = Poseidon(5);
     leaf_hasher.inputs[0] <== stealth_pk;
     leaf_hasher.inputs[1] <== schema_id;

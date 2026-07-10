@@ -114,6 +114,16 @@ template Withdrawal(levels) {
     }
 
     // ── 3. nullifier binding ──────────────────────────────────────────────────
+    // SECURITY NOTE (OPQ-024) — nullifier_hash = Poseidon(nullifier) is independent of the
+    // commitment (value/label/secret). Two deposits that reuse the same `nullifier` (a
+    // depositor foot-gun, since `precommitment` is accepted verbatim on deposit) collapse to
+    // one nullifier_hash, so the second becomes permanently unspendable once the first is
+    // withdrawn. The fix binds commitment-specific data — `nullifier_hash = Poseidon(nullifier,
+    // label)` (or `Poseidon(nullifier, commitment)`) — but changing the circuit requires a new
+    // production trusted-setup ceremony (mainnet-gated) and a coordinated verifier redeploy, so
+    // it is NOT applied here. Mitigations in place until then: the SDK MUST draw a fresh random
+    // (nullifier, secret) per deposit, and per-deposit uniqueness is documented in
+    // spec/privacy-pool.md. (Not third-party exploitable — self-inflicted.)
     component null_hasher = Poseidon(1);
     null_hasher.inputs[0] <== nullifier;
     null_hasher.out === nullifier_hash;
